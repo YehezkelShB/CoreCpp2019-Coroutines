@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <future>
 #include <string>
 #include <vector>
 
-std::future<std::vector<std::string>> readLines(std::string path);
-std::future<uint64_t> countLines(std::vector<std::string> paths);
+#define BOOST_THREAD_VERSION 4
+#include <boost/thread/future.hpp>
+
+boost::future<std::vector<std::string>> readLines(std::string path);
+uint64_t countLines(std::vector<std::string> paths);

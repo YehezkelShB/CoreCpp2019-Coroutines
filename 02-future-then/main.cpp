@@ -6,10 +6,9 @@ int main(int argc, char* argv[])
 {
     if (argc != 2) return EXIT_FAILURE;
 
-    auto f1 = readLines(argv[1]);
-    auto f2 = countLines(f1.get());
+    auto f = readLines(argv[1]).then([](auto f) { return countLines(f.get()); });
 
     // ...
 
-    std::cout << f2.get() << '\n';
+    std::cout << f.get() << '\n';
 }

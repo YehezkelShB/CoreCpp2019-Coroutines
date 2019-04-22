@@ -2,9 +2,9 @@
 
 #include <fstream>
 
-std::future<std::vector<std::string>> readLines(std::string path)
+boost::future<std::vector<std::string>> readLines(std::string path)
 {
-    return std::async(std::launch::async, [path = std::move(path)] {
+    return boost::async(boost::launch::async, [path = std::move(path)] {
         std::vector<std::string> res;
         std::ifstream file(path);
         for (std::string line; std::getline(file, line);)
@@ -29,14 +29,12 @@ uint64_t countLines(std::string path)
 }
 } // namespace
 
-std::future<uint64_t> countLines(std::vector<std::string> paths)
+uint64_t countLines(std::vector<std::string> paths)
 {
-    return std::async(std::launch::async, [paths = std::move(paths)] {
-        uint64_t res = 0;
-        for (const auto& path : paths)
-        {
-            res += countLines(path);
-        }
-        return res;
-    });
+    uint64_t res = 0;
+    for (const auto& path : paths)
+    {
+        res += countLines(path);
+    }
+    return res;
 }
