@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 
     auto t1 = [argv]() -> cppcoro::task<uint64_t> {
         uint64_t lines = 0;
-        for (const auto& path : readLines(argv[1]))
+        for co_await (const auto& path : readLines(argv[1]))
         {
             lines += co_await countLines(path);
         }
