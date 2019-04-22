@@ -10,8 +10,11 @@ int main(int argc, char* argv[])
     if (argc != 2) return EXIT_FAILURE;
 
     auto t1 = [argv]() -> cppcoro::task<uint64_t> {
-        std::vector<std::string> paths = co_await readLines(argv[1]);
-        uint64_t lines = co_await countLines(paths);
+        uint64_t lines = 0;
+        for (const auto& path : readLines(argv[1]))
+        {
+            lines += co_await countLines(path);
+        }
         co_return lines;
     };
 
