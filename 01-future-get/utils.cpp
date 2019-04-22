@@ -40,9 +40,3 @@ std::future<uint64_t> countLines(std::vector<std::string> paths)
         return res;
     });
 }
-
-std::vector<std::string> getFileList()
-{
-    // TODO: unimplemented
-    return {};
-}
