@@ -6,3 +6,4 @@ project ("CoreCpp2019-Coroutines")
 
 add_subdirectory("00-future")
 add_subdirectory("01-future-get")
+add_subdirectory("02-future-then")
