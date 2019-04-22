@@ -1,42 +1,75 @@
 #include "utils.h"
+#include "ioservice.h"
 
-#include <fstream>
+#include <cppcoro/read_only_file.hpp>
 
-std::future<std::vector<std::string>> readLines(std::string path)
+cppcoro::task<std::vector<std::string>> readLines(std::string path)
 {
-    return std::async(std::launch::async, [path = std::move(path)] {
-        std::vector<std::string> res;
-        std::ifstream file(path);
-        for (std::string line; std::getline(file, line);)
+    auto file = cppcoro::read_only_file::open(IoService::get(), path);
+
+    constexpr size_t bufferSize = 4096;
+    auto buffer = std::string(bufferSize, '\0');
+
+    std::vector<std::string> res;
+    auto newLine = true;
+
+    for (uint64_t offset = 0, fileSize = file.size(); offset < fileSize;)
+    {
+        const auto bytesToRead = static_cast<size_t>(
+            std::min<uint64_t>(bufferSize, fileSize - offset));
+
+        const auto bytesRead = co_await file.read(offset, buffer.data(), bytesToRead);
+
+        for (size_t i = 0; i < bytesRead;)
         {
-            res.push_back(line);
+            auto currentLineEndLocation = buffer.find('\n', i);
+            if (newLine)
+            {
+                res.push_back({});
+            }
+            newLine = currentLineEndLocation != buffer.npos;
+            res.back().append(buffer, i, newLine ? currentLineEndLocation - i : buffer.npos);
+            if (!newLine)
+            {
+                break;
+            }
+            i = currentLineEndLocation + 1;
         }
-        return res;
-    });
+
+        offset += bytesRead;
+    }
+    co_return res;
 }
 
 namespace
 {
-uint64_t countLines(std::string path)
+cppcoro::task<uint64_t> countLines(const std::string& path)
 {
-    std::ifstream file(path);
-    uint64_t res = 0;
-    for (std::string line; std::getline(file, line);)
+    auto file = cppcoro::read_only_file::open(IoService::get(), path);
+
+    constexpr size_t bufferSize = 4096;
+    auto buffer = std::make_unique<std::uint8_t[]>(bufferSize);
+
+    uint64_t newlineCount = 0;
+    for (uint64_t offset = 0, fileSize = file.size(); offset < fileSize;)
     {
-        ++res;
+        const auto bytesToRead = static_cast<size_t>(
+            std::min<uint64_t>(bufferSize, fileSize - offset));
+
+        const auto bytesRead = co_await file.read(offset, buffer.get(), bytesToRead);
+        newlineCount += std::count(buffer.get(), buffer.get() + bytesRead, '\n');
+        offset += bytesRead;
     }
-    return res;
+    co_return newlineCount;
 }
 } // namespace
 
-std::future<uint64_t> countLines(std::vector<std::string> paths)
+cppcoro::task<uint64_t> countLines(std::vector<std::string> paths)
 {
-    return std::async(std::launch::async, [paths = std::move(paths)] {
-        uint64_t res = 0;
-        for (const auto& path : paths)
-        {
-            res += countLines(path);
-        }
-        return res;
-    });
+    uint64_t res = 0;
+    for (const auto& path : paths)
+    {
+        res += co_await countLines(path);
+    }
+    co_return res;
 }
