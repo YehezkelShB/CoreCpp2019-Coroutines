@@ -5,7 +5,7 @@
 #include <cppcoro/sync_wait.hpp>
 #include <cppcoro/when_all.hpp>
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) try
 {
     if (argc != 2) return EXIT_FAILURE;
 
@@ -22,4 +22,14 @@ int main(int argc, char* argv[])
 
     auto results = cppcoro::sync_wait(cppcoro::when_all(t1(), t2()));
     std::cout << std::get<0>(results) << '\n';
+}
+catch (std::exception& e)
+{
+    std::cerr << "Exception: " << e.what() << '\n';
+    return EXIT_FAILURE;
+}
+catch (...)
+{
+    std::cerr << "Unknown exception\n";
+    return EXIT_FAILURE;
 }

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) try
 {
     if (argc != 2) return EXIT_FAILURE;
 
@@ -16,4 +16,14 @@ int main(int argc, char* argv[])
         std::cout << line << '\n';
     }
     std::cout << f2.get() << '\n';
+}
+catch (std::exception& e)
+{
+    std::cerr << "Exception: " << e.what() << '\n';
+    return EXIT_FAILURE;
+}
+catch (...)
+{
+    std::cerr << "Unknown exception\n";
+    return EXIT_FAILURE;
 }
