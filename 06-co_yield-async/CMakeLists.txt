@@ -7,7 +7,7 @@ target_link_directories(co_yield-async PUBLIC "../external/cppcoro/build")
 if (WIN32)
     target_link_libraries(co_yield-async
         debug "windows_x64_msvc15_debug/lib/cppcoro"
-        optimized "windows_x64_msvc15_optimized/lib/cppcoro")
+        optimized "windows_x64_msvc15_optimised/lib/cppcoro")
     target_link_libraries(co_yield-async "Synchronization.lib" "Ws2_32.lib")
 endif()
 
