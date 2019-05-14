@@ -51,14 +51,19 @@ cppcoro::task<uint64_t> countLines(const std::string& path)
     auto buffer = std::make_unique<std::uint8_t[]>(bufferSize);
 
     uint64_t newlineCount = 0;
+    size_t bytesRead = 0;
     for (uint64_t offset = 0, fileSize = file.size(); offset < fileSize;)
     {
         const auto bytesToRead = static_cast<size_t>(
             std::min<uint64_t>(bufferSize, fileSize - offset));
 
-        const auto bytesRead = co_await file.read(offset, buffer.get(), bytesToRead);
+        bytesRead = co_await file.read(offset, buffer.get(), bytesToRead);
         newlineCount += std::count(buffer.get(), buffer.get() + bytesRead, '\n');
         offset += bytesRead;
+    }
+    if (bytesRead && buffer[bytesRead - 1] != '\n')
+    {
+        ++newlineCount;
     }
     co_return newlineCount;
 }
