@@ -7,3 +7,6 @@ cppcoro is included here under `external/cppcoro` as a submodule.
 For build instructions, see [cppcoro build instructions](https://github.com/lewissbaker/cppcoro#building). For example, on Windows I use `cake.bat architecture=x64 lib/build.cake`.
 
 `countLines()` function (in `utils.cpp`) is based on the example found in [cppcoro `README.md`](https://github.com/lewissbaker/cppcoro#io_service-and-io_work_scope)
+
+The code examples are under MIT license, as mentioned in `LICENSE`.
+The presentation is under CC-BY-NC.
